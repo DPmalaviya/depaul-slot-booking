@@ -13,5 +13,20 @@
     "slotId": "1000",
     "timeRange": "10:00 - 10:30",
     "bookedAt": "2026-04-13T10:00:00Z"
+  },
+  {
+    "id": "1713052800000",
+    "name": "John Doe",
+    "email": "jdoe@depaul.edu",
+    "studentId": "1234567",
+    "course": "CSC 555 - Mining Big Data",
+    "subject": "Project Review",
+    "reason": "Need help with classification model",
+    "day": "Monday",
+    "dayDate": "2026-04-13",
+    "dayDisplay": "Apr 13, 2026",
+    "slotId": "1030",
+    "timeRange": "10:30 – 11:00",
+    "bookedAt": "2026-04-13T15:30:00.000Z"
   }
 ]
