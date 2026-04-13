@@ -1032,36 +1032,15 @@
     // ================================================================
     // GITHUB API — READ / WRITE bookings.json
     // ================================================================
-    function ghURL() {
-      return `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.DATA_PATH}`;
-    }
-    function ghHeaders() {
-      const h = { 'Accept': 'application/vnd.github.v3+json' };
-      if (CONFIG.GT_TOKEN) h['Authorization'] = `Bearer ${CONFIG.GT_TOKEN}`;
-      return h;
-    }
 
     async function loadBookings() {
       setLoading(true, 'Loading bookings...');
-      try {
-        const res = await fetch(ghURL() + '?ref=' + CONFIG.GITHUB_BRANCH, { headers: ghHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          fileSha = data.sha;
-          bookings = JSON.parse(decodeURIComponent(atob(data.content.replace(/\n/g, ''))));
-        } else {
-          await loadRaw();
-        }
-      } catch { await loadRaw(); }
-      setLoading(false);
-    }
-
-    async function loadRaw() {
       try {
         const url = `https://raw.githubusercontent.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/${CONFIG.GITHUB_BRANCH}/${CONFIG.DATA_PATH}?t=${Date.now()}`;
         const res = await fetch(url);
         bookings = res.ok ? await res.json() : [];
       } catch { bookings = []; }
+      setLoading(false);
     }
 
 
