@@ -401,6 +401,7 @@
       GITHUB_REPO: 'depaul-slot-booking',
       GITHUB_BRANCH: 'main',
       DATA_PATH: 'data/bookings.json',
+      GT_TOKEN: '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',
     };
 
     let bookings = [];
@@ -727,7 +728,7 @@
     }
     function ghHeaders() {
       const h = { 'Accept': 'application/vnd.github.v3+json' };
-      if (secrets.GT_TOKEN) h['Authorization'] = `Bearer ${secrets.GT_TOKEN}`;
+      if (CONFIG.GT_TOKEN) h['Authorization'] = `Bearer ${CONFIG.GT_TOKEN}`;
       return h;
     }
 
@@ -756,7 +757,7 @@
     }
 
     async function saveBookings(triggerBooking) {
-      if (!secrets.GT_TOKEN) { toast('No GitHub token — changes not saved'); return; }
+      if (!CONFIG.GT_TOKEN) { toast('No GitHub token — changes not saved'); return; }
       const content = btoa(encodeURIComponent(JSON.stringify(bookings, null, 2)));
       const body = {
         message: `Admin: Updated bookings (${triggerBooking ? triggerBooking.name : 'edit'})`,
