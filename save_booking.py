@@ -3,11 +3,19 @@ import json
 import os
 import urllib.request
 
-booking_data = os.environ.get('BOOKING_DATA', '[]')
+booking_data = os.environ.get('BOOKING_DATA', '{}')
 gh_token = os.environ.get('GH_TOKEN')
 repo = os.environ.get('REPO')
 
-new_booking = json.loads(booking_data)
+try:
+    new_booking = json.loads(booking_data)
+except:
+    print("Invalid booking data")
+    exit(1)
+
+if not new_booking:
+    print("No booking data provided")
+    exit(0)
 
 req = urllib.request.Request(
     f'https://api.github.com/repos/{repo}/contents/data/bookings.json',
@@ -23,11 +31,14 @@ except:
     current = []
     sha = None
 
+if not isinstance(current, list):
+    current = []
+
 current.append(new_booking)
 
 content = base64.b64encode(json.dumps(current, indent=2, ensure_ascii=False).encode('utf-8')).decode()
 
-body = {'message': f"Booking: {new_booking['name']}", 'content': content, 'branch': 'main'}
+body = {'message': f"Booking: {new_booking.get('name', 'Unknown')}", 'content': content, 'branch': 'main'}
 if sha:
     body['sha'] = sha
 
