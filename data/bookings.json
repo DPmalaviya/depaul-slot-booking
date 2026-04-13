@@ -11,7 +11,7 @@
     "dayDate": "2026-04-15",
     "dayDisplay": "Apr 15, 2026",
     "slotId": "1330",
-    "timeRange": "13:30 Ã¢ÂÂ 14:00",
+    "timeRange": "13:30 ÃÂ¢ÃÂÃÂ 14:00",
     "bookedAt": "2026-04-13T19:17:30.792Z"
   },
   {
@@ -26,7 +26,7 @@
     "dayDate": "2026-04-13",
     "dayDisplay": "Apr 13, 2026",
     "slotId": "1000",
-    "timeRange": "10:00 â 10:30",
+    "timeRange": "10:00 Ã¢ÂÂ 10:30",
     "bookedAt": "2026-04-13T19:19:52.440Z"
   },
   {
@@ -41,7 +41,22 @@
     "dayDate": "2026-04-13",
     "dayDisplay": "Apr 13, 2026",
     "slotId": "1130",
-    "timeRange": "11:30 – 12:00",
+    "timeRange": "11:30 â 12:00",
     "bookedAt": "2026-04-13T19:23:56.446Z"
+  },
+  {
+    "id": "1776109560247",
+    "name": "xx",
+    "email": "x@depaul.edu",
+    "studentId": "x",
+    "course": "dd",
+    "subject": "dd",
+    "reason": "ddd",
+    "day": "Wednesday",
+    "dayDate": "2026-04-15",
+    "dayDisplay": "Apr 15, 2026",
+    "slotId": "1230",
+    "timeRange": "12:30 – 13:00",
+    "bookedAt": "2026-04-13T19:46:00.247Z"
   }
 ]
