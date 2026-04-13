@@ -396,12 +396,12 @@
 
   <script>
     const CONFIG = {
-      ADMIN_PASSWORD: 'admin123',
+      ADMIN_PASSWORD: 'CHANGE_THIS_PASSWORD',
       GITHUB_OWNER: 'betahubdepaul-byte',
       GITHUB_REPO: 'depaul-slot-booking',
       GITHUB_BRANCH: 'main',
       DATA_PATH: 'data/bookings.json',
-      GITHUB_TOKEN: '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',
+      GT_TOKEN: 'YOUR_GT_TOKEN_HERE',
     };
 
     let bookings = [];
@@ -728,7 +728,7 @@
     }
     function ghHeaders() {
       const h = { 'Accept': 'application/vnd.github.v3+json' };
-      if (CONFIG.GITHUB_TOKEN) h['Authorization'] = `Bearer ${CONFIG.GITHUB_TOKEN}`;
+      if (CONFIG.GT_TOKEN) h['Authorization'] = `Bearer ${CONFIG.GT_TOKEN}`;
       return h;
     }
 
@@ -757,7 +757,7 @@
     }
 
     async function saveBookings(triggerBooking) {
-      if (!CONFIG.GITHUB_TOKEN) { toast('No GitHub token — changes not saved'); return; }
+      if (!CONFIG.GT_TOKEN) { toast('No GitHub token — changes not saved'); return; }
       const content = btoa(encodeURIComponent(JSON.stringify(bookings, null, 2)));
       const body = {
         message: `Admin: Updated bookings (${triggerBooking ? triggerBooking.name : 'edit'})`,
