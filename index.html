@@ -949,8 +949,7 @@
       };
 
       setLoading(true, 'Saving booking...');
-      await saveToGitHub(booking);
-
+      const success = await saveToGitHub(booking);
       setLoading(false);
 
       // Build confirmation
@@ -968,71 +967,89 @@
         `<div class="detail-row"><span class="lbl">${l}</span><span class="val">${val}</span></div>`
       ).join('');
 
-      document.getElementById('email-status-box').innerHTML = `<div class="email-status email-ok"><strong>Booking confirmed!</strong><br>Your appointment has been saved.</div>`;
-        ? `<div class="email-status email-ok">
-         <strong>Booking confirmed!</strong><br>
-         Confirmation sent to ${booking.email} and admin.
-       </div>`
-        : `<div class="email-status email-fail">
-         <strong>⚠️ Some issues occurred</strong><br>
-         Please contact admin to confirm.
-       </div>`;
+      if (success) {
+        document.getElementById('email-status-box').innerHTML = `
+          <div class="email-status email-ok">
+            <strong>Booking confirmed!</strong><br>
+            A confirmation email will be sent to ${booking.email} via GitHub Actions.
+          </div>`;
+      } else {
+        document.getElementById('email-status-box').innerHTML = `
+          <div class="email-status email-fail">
+            <strong>⚠️ Some issues occurred with triggering Actions</strong><br>
+            Please check your GitHub token.
+          </div>`;
+      }
 
       showScreen('step4');
     }
 
     async function saveToGitHub(booking) {
+      if (!CONFIG.GT_TOKEN) {
+        toast('GitHub token missing in CONFIG');
+        return false;
+      }
+
       try {
-        // Get current file SHA
-        const getRes = await fetch(
-          `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.DATA_PATH}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${CONFIG.GT_TOKEN}`,
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          }
-        );
-        
-        let sha = null;
-        if (getRes.ok) {
-          const getData = await getRes.json();
-          sha = getData.sha;
-        }
-
-        // Add booking to list
-        bookings.push(booking);
-
-        // Save
-        const content = btoa(encodeURIComponent(JSON.stringify(bookings, null, 2)));
-        const body = {
-          message: `Booking: ${booking.name} — ${booking.day} ${booking.dayDisplay}`,
-          content,
-          branch: CONFIG.GITHUB_BRANCH,
+        const url = `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/actions/workflows/handle_booking.yml/dispatches`;
+        const headers = {
+          'Authorization': `Bearer ${CONFIG.GT_TOKEN}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
         };
-        if (sha) body.sha = sha;
 
-        const saveRes = await fetch(
-          `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.DATA_PATH}`,
-          {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${CONFIG.GT_TOKEN}`,
-              'Accept': 'application/vnd.github.v3+json',
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-          }
-        );
+        // 1. Trigger save_booking action in the workflow
+        const saveRes = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            ref: CONFIG.GITHUB_BRANCH,
+            inputs: {
+              action: 'save_booking',
+              booking_data: JSON.stringify(booking)
+            }
+          })
+        });
 
         if (!saveRes.ok) {
-          const error = await saveRes.json().catch(() => ({}));
-          toast('Failed to save booking');
-          console.error('Save error:', error);
+           const err = await saveRes.text();
+           console.error('Trigger save error:', err);
+           toast('Failed to trigger save_booking action');
+           return false;
         }
+
+        // 2. Trigger send_email action in the workflow
+        const emailRes = await fetch(url, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            ref: CONFIG.GITHUB_BRANCH,
+            inputs: {
+              action: 'send_email',
+              name: booking.name || '',
+              email: booking.email || '',
+              student_id: booking.studentId || '',
+              course: booking.course || '',
+              subject: booking.subject || '',
+              reason: booking.reason || '',
+              day: booking.day || '',
+              day_display: booking.dayDisplay || '',
+              time_range: booking.timeRange || ''
+            }
+          })
+        });
+
+        if (!emailRes.ok) {
+           console.error('Trigger email error');
+        }
+
+        bookings.push(booking); // optimistically update local state
+        return true;
+
       } catch (e) {
-        console.error('Save error:', e);
-        toast('Network error');
+        console.error('Trigger handle_booking error:', e);
+        toast('Network error while triggering actions');
+        return false;
       }
     }
 
