@@ -148,5 +148,20 @@
     "slotId": "1030",
     "timeRange": "10:30 – 11:00",
     "bookedAt": "2026-04-14T17:57:38.900Z"
+  },
+  {
+    "id": "1776193111123",
+    "name": "Patel",
+    "email": "dmalaviy@depaul.edu",
+    "studentId": "bbi",
+    "course": "no",
+    "subject": "hbib",
+    "reason": "ibi",
+    "day": "Tuesday",
+    "dayDate": "2026-04-14",
+    "dayDisplay": "Apr 14, 2026",
+    "slotId": "1100",
+    "timeRange": "11:00 – 11:30",
+    "bookedAt": "2026-04-14T18:58:31.123Z"
   }
 ]
