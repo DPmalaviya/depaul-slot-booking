@@ -47,9 +47,14 @@ msg['Cc'] = admin_email
 msg['Subject'] = f"Slot Confirmed - {day}, {day_display} at {time_range}"
 msg.attach(MIMEText(body_html, 'html'))
 
+# Support multiple CC recipients separated by commas
+cc_list = [addr.strip() for addr in admin_email.split(',')] if admin_email else []
+recipients = [email] + cc_list
+
 server = smtplib.SMTP('smtp.gmail.com', 587)
 server.starttls()
 server.login(gmail_email, gmail_password)
-server.sendmail(gmail_email, [email, admin_email], msg.as_string())
+server.sendmail(gmail_email, recipients, msg.as_string())
 server.quit()
-print(f"Email sent to {email} and {admin_email}")
+print(f"Email sent to {email} and CC'd to {admin_email}")
+
