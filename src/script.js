@@ -35,10 +35,9 @@ function goStep2() {
   const id = v('f-id');
   const email = v('f-email');
   const course = v('f-course');
-  const subject = v('f-subject');
   const reason = v('f-reason');
 
-  if (!name || !id || !email || !course || !subject || !reason) {
+  if (!name || !id || !email || !course || !reason) {
     toast('Please fill in all fields'); return;
   }
   if (!email.endsWith('@depaul.edu')) {
@@ -46,7 +45,7 @@ function goStep2() {
   }
   document.getElementById('email-err').style.display = 'none';
 
-  student = { name, id, email, course, subject, reason };
+  student = { name, id, email, course, reason };
   selectedDate = null;
   selectedSlot = null;
 
@@ -233,7 +232,6 @@ async function submitBooking() {
     email: student.email,
     studentId: student.id,
     course: student.course,
-    subject: student.subject,
     reason: student.reason,
     day: selectedDate.name,
     dayDate: selectedDate.date,
@@ -253,7 +251,6 @@ async function submitBooking() {
     ['Email', booking.email],
     ['Student ID', booking.studentId],
     ['Course', booking.course],
-    ['Subject', booking.subject],
     ['Reason', booking.reason],
     ['Date', `${booking.day}, ${booking.dayDisplay}`],
     ['Time Slot', booking.timeRange],
@@ -333,7 +330,6 @@ async function saveToGitHub(booking) {
           email: booking.email || '',
           student_id: booking.studentId || '',
           course: booking.course || '',
-          subject: booking.subject || '',
           reason: booking.reason || '',
           day: booking.day || '',
           day_display: booking.dayDisplay || '',

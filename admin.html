@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DePaul Slot Booking — Admin</title>
+  <title>BETA Hub Reservation — Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="src/admin.css" />
 </head>
@@ -26,7 +26,7 @@
     <div class="admin-header">
       <div class="logo-row">
         <div class="logo-icon">D</div>
-        <h1>DePaul Slot Booking — Admin</h1>
+        <h1>BETA Hub Reservation — Admin</h1>
       </div>
       <div class="right">
         <button class="logout" onclick="logout()">Sign Out</button>
@@ -70,7 +70,6 @@
                 <th>Date</th>
                 <th>Time</th>
                 <th>Course</th>
-                <th>Subject</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -94,7 +93,6 @@
       <div class="field"><label>Email *</label><input type="email" id="create-email" placeholder="@depaul.edu" /></div>
       <div class="field"><label>Student ID *</label><input type="text" id="create-studentId" placeholder="Student ID" /></div>
       <div class="field"><label>Course *</label><input type="text" id="create-course" placeholder="e.g. CSC 555 - Mining Big Data" /></div>
-      <div class="field"><label>Subject *</label><input type="text" id="create-subject" placeholder="e.g. Project Review" /></div>
       <div class="field"><label>Reason</label><textarea id="create-reason" rows="2" placeholder="Brief reason for the appointment"></textarea></div>
       <div class="field">
         <label>Date *</label>
@@ -124,7 +122,6 @@
       <div class="field"><label>Email</label><input type="email" id="edit-email" /></div>
       <div class="field"><label>Student ID</label><input type="text" id="edit-studentId" /></div>
       <div class="field"><label>Course</label><input type="text" id="edit-course" /></div>
-      <div class="field"><label>Subject</label><input type="text" id="edit-subject" /></div>
       <div class="field"><label>Reason</label><textarea id="edit-reason" rows="3"></textarea></div>
       <div class="modal-btns">
         <button class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>

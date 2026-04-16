@@ -15,6 +15,23 @@ const CONFIG = {
 let bookings = [];
 let fileSha = null;
 
+function to12HourRange(range) {
+  if (!range || typeof range !== 'string') return range;
+
+  const m = range.match(/^(\d{2}):(\d{2})\s*[\u2013-]\s*(\d{2}):(\d{2})$/);
+  if (!m) return range;
+
+  const to12 = (h, min) => {
+    const hour24 = Number(h);
+    const minute = String(min).padStart(2, '0');
+    const period = hour24 >= 12 ? 'PM' : 'AM';
+    const hour12 = hour24 % 12 || 12;
+    return `${hour12}:${minute} ${period}`;
+  };
+
+  return `${to12(m[1], m[2])} - ${to12(m[3], m[4])}`;
+}
+
 function attemptLogin() {
   const pass = document.getElementById('admin-pass').value;
   if (pass === CONFIG.ADMIN_PASSWORD) {
@@ -63,14 +80,13 @@ function openCreateModal() {
   }
 
   getTimeSlots().forEach(sl => {
-    slotSelect.innerHTML += `<option value="${sl.id}|${sl.range}">${sl.range}</option>`;
+    slotSelect.innerHTML += `<option value="${sl.id}|${sl.range}">${to12HourRange(sl.range)}</option>`;
   });
 
   document.getElementById('create-name').value = '';
   document.getElementById('create-email').value = '';
   document.getElementById('create-studentId').value = '';
   document.getElementById('create-course').value = '';
-  document.getElementById('create-subject').value = '';
   document.getElementById('create-reason').value = '';
   document.getElementById('create-modal').classList.add('on');
 }
@@ -84,12 +100,11 @@ async function saveCreate() {
   const email = document.getElementById('create-email').value.trim();
   const studentId = document.getElementById('create-studentId').value.trim();
   const course = document.getElementById('create-course').value.trim();
-  const subject = document.getElementById('create-subject').value.trim();
   const reason = document.getElementById('create-reason').value.trim();
   const dateVal = document.getElementById('create-date').value;
   const slotVal = document.getElementById('create-slot').value;
 
-  if (!name || !email || !studentId || !course || !subject || !dateVal || !slotVal) {
+  if (!name || !email || !studentId || !course || !dateVal || !slotVal) {
     toast('Please fill in all required fields.'); return;
   }
   if (!email.endsWith('@depaul.edu')) {
@@ -107,7 +122,7 @@ async function saveCreate() {
 
   const booking = {
     id: Date.now().toString(),
-    name, email, studentId, course, subject, reason,
+    name, email, studentId, course, reason,
     day: dayName, dayDate, dayDisplay,
     slotId, timeRange,
     bookedAt: new Date().toISOString(),
@@ -160,7 +175,7 @@ function renderOverview() {
       <div class="booking-item">
         <div class="info">
           <div class="bname">${b.name}</div>
-          <div class="bdetail">${b.day}, ${b.dayDisplay} · ${b.timeRange} · ${b.subject}</div>
+          <div class="bdetail">${b.day}, ${b.dayDisplay} · ${to12HourRange(b.timeRange)}</div>
         </div>
         <span class="badge">${b.course.split(' - ')[0]}</span>
       </div>`).join('');
@@ -171,12 +186,12 @@ function renderBookingsTable() {
   const q = document.getElementById('search-input').value.toLowerCase();
   const filtered = bookings.filter(b =>
     !q || b.name.toLowerCase().includes(q) || b.email.toLowerCase().includes(q) ||
-    b.course.toLowerCase().includes(q) || b.subject.toLowerCase().includes(q)
+    b.course.toLowerCase().includes(q)
   );
   const sorted = [...filtered].sort((a, b) => new Date(b.bookedAt) - new Date(a.bookedAt));
 
   if (sorted.length === 0) {
-    document.getElementById('bookings-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">No bookings found.</td></tr>';
+    document.getElementById('bookings-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--muted)">No bookings found.</td></tr>';
     return;
   }
 
@@ -185,9 +200,8 @@ function renderBookingsTable() {
       <td><strong>${b.name}</strong><br><span style="color:var(--muted);font-size:11px">${b.studentId}</span></td>
       <td>${b.email}</td>
       <td>${b.day}<br><span style="color:var(--muted);font-size:11px">${b.dayDisplay}</span></td>
-      <td>${b.timeRange}</td>
+      <td>${to12HourRange(b.timeRange)}</td>
       <td>${b.course.split(' - ')[0]}</td>
-      <td>${b.subject}</td>
       <td>
         <div class="row-actions">
           <button class="edit-btn" onclick="openEditModal('${b.id}')">Edit</button>
@@ -205,7 +219,6 @@ function openEditModal(id) {
   document.getElementById('edit-email').value = b.email;
   document.getElementById('edit-studentId').value = b.studentId;
   document.getElementById('edit-course').value = b.course;
-  document.getElementById('edit-subject').value = b.subject;
   document.getElementById('edit-reason').value = b.reason;
   document.getElementById('edit-modal').classList.add('on');
 }
@@ -223,10 +236,9 @@ async function saveEdit() {
   const email = document.getElementById('edit-email').value.trim();
   const studentId = document.getElementById('edit-studentId').value.trim();
   const course = document.getElementById('edit-course').value.trim();
-  const subject = document.getElementById('edit-subject').value.trim();
   const reason = document.getElementById('edit-reason').value.trim();
 
-  if (!name || !email || !studentId || !course || !subject) {
+  if (!name || !email || !studentId || !course) {
     toast('Please fill in all required fields.'); return;
   }
   if (!email.endsWith('@depaul.edu')) {
@@ -235,7 +247,7 @@ async function saveEdit() {
 
   const updated = {
     ...bookings[idx],
-    name, email, studentId, course, subject, reason,
+    name, email, studentId, course, reason,
   };
 
   bookings[idx] = updated;
@@ -267,8 +279,8 @@ async function confirmDelete() {
 }
 
 function exportCSV() {
-  const headers = ['Name', 'Email', 'Student ID', 'Course', 'Subject', 'Reason', 'Date', 'Time', 'Booked At'];
-  const rows = bookings.map(b => [b.name, b.email, b.studentId, b.course, b.subject, b.reason, b.dayDate, b.timeRange, b.bookedAt]);
+  const headers = ['Name', 'Email', 'Student ID', 'Course', 'Reason', 'Date', 'Time', 'Booked At'];
+  const rows = bookings.map(b => [b.name, b.email, b.studentId, b.course, b.reason, b.dayDate, b.timeRange, b.bookedAt]);
   const csv = [headers, ...rows].map(r => r.map(v => `"${(v || '').replace(/"/g, '""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
@@ -306,7 +318,7 @@ function renderAvailability() {
       const bk = dayBookings.find(b => b.slotId === sl.id);
       return `
             <div class="slot-toggle">
-              <span class="slot-time">${sl.range}</span>
+              <span class="slot-time">${to12HourRange(sl.range)}</span>
               ${taken
           ? `<span class="taken-name">${bk.name}</span>`
           : `<span class="open-label">Open</span>`}
