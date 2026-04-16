@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "1776361581368",
+    "name": "atel",
+    "email": "dmalaviy@depaul.edu",
+    "studentId": "79",
+    "course": "hh",
+    "reason": "hiio",
+    "day": "Thursday",
+    "dayDate": "2026-04-16",
+    "dayDisplay": "Apr 16, 2026",
+    "slotId": "1500",
+    "timeRange": "15:00 – 15:30",
+    "bookedAt": "2026-04-16T17:46:21.368Z"
+  }
+]
