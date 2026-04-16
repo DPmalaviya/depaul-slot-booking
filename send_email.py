@@ -11,7 +11,6 @@ name = os.environ.get('NAME')
 email = os.environ.get('EMAIL')
 student_id = os.environ.get('STUDENT_ID')
 course = os.environ.get('COURSE')
-subject = os.environ.get('SUBJECT')
 reason = os.environ.get('REASON')
 day = os.environ.get('DAY')
 day_display = os.environ.get('DAY_DISPLAY')
@@ -21,7 +20,7 @@ body_html = f"""
 <html>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
   <div style="background: #1E4D8C; color: white; padding: 20px; border-radius: 12px 12px 0 0; text-align: center;">
-    <h2 style="margin: 0;">DePaul Slot Booking - Confirmed</h2>
+    <h2 style="margin: 0;">BETA Hub Reservation - Confirmed</h2>
   </div>
   <div style="background: white; padding: 24px; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 12px 12px;">
     <p>Hi <strong>{name}</strong>,</p>
@@ -31,7 +30,6 @@ body_html = f"""
       <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Time</td><td style="padding: 8px;">{time_range}</td></tr>
       <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Student</td><td style="padding: 8px;">{name} ({student_id})</td></tr>
       <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Course</td><td style="padding: 8px;">{course}</td></tr>
-      <tr><td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Subject</td><td style="padding: 8px;">{subject}</td></tr>
       <tr><td style="padding: 8px;">Reason</td><td style="padding: 8px;">{reason}</td></tr>
     </table>
     <p style="color: #666; font-size: 13px;">This is an automated confirmation. Please arrive on time.</p>
