@@ -424,10 +424,37 @@ function toast(msg) {
   setTimeout(() => t.style.display = 'none', 3000);
 }
 
-['create-studentId', 'edit-studentId'].forEach((id) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener('input', () => {
-    el.value = el.value.replace(/\D/g, '');
+function enforceDigitOnlyInput(inputEl) {
+  if (!inputEl) return;
+
+  inputEl.addEventListener('keydown', (e) => {
+    const allowedKeys = [
+      'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'
+    ];
+    const isShortcut = e.ctrlKey || e.metaKey;
+    if (allowedKeys.includes(e.key) || isShortcut) return;
+    if (!/^\d$/.test(e.key)) e.preventDefault();
   });
+
+  inputEl.addEventListener('beforeinput', (e) => {
+    if (!e.data) return;
+    if (!/^\d+$/.test(e.data)) e.preventDefault();
+  });
+
+  inputEl.addEventListener('paste', (e) => {
+    const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    if (!/^\d+$/.test(pasted)) {
+      e.preventDefault();
+      inputEl.value = (inputEl.value + pasted).replace(/\D/g, '');
+    }
+  });
+
+  // Fallback sanitizer if browser allows non-digit input events.
+  inputEl.addEventListener('input', () => {
+    inputEl.value = inputEl.value.replace(/\D/g, '');
+  });
+}
+
+['create-studentId', 'edit-studentId'].forEach((id) => {
+  enforceDigitOnlyInput(document.getElementById(id));
 });

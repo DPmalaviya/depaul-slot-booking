@@ -73,9 +73,10 @@ function changeMonth(delta) {
 }
 
 function countAvailable(dayDate) {
-  const totalSlots = 12; // 10:00-16:00 in 30-min = 12 slots
+  const totalSlots = getTimeSlots().length;
   const booked = bookings.filter(b => b.dayDate === dayDate).length;
-  return totalSlots - booked;
+  const blockedByTime = getTimeSlots().filter(s => isPastSlotForToday(dayDate, s.id)).length;
+  return Math.max(0, totalSlots - booked - blockedByTime);
 }
 
 function renderCalendar() {
@@ -174,9 +175,17 @@ function renderTimeGrid() {
   const slots = getTimeSlots();
   let html = '';
 
+  if (selectedSlot) {
+    const slotTakenNow = bookings.find(b => b.dayDate === selectedDate.date && b.slotId === selectedSlot.id);
+    if (slotTakenNow || isPastSlotForToday(selectedDate.date, selectedSlot.id)) {
+      selectedSlot = null;
+    }
+  }
+
   slots.forEach(sl => {
     const bk = bookings.find(b => b.dayDate === selectedDate.date && b.slotId === sl.id);
     const yours = bk && bk.email === student.email;
+    const past = isPastSlotForToday(selectedDate.date, sl.id);
     const sel = selectedSlot && selectedSlot.id === sl.id;
 
     let cls = 'time-card ';
@@ -189,6 +198,9 @@ function renderTimeGrid() {
     } else if (bk) {
       cls += 'taken';
       statusText = 'Taken';
+    } else if (past) {
+      cls += 'taken';
+      statusText = 'Time passed';
     } else {
       cls += sel ? 'selected' : 'open';
       statusText = sel ? 'Selected ✓' : 'Available';
@@ -222,6 +234,12 @@ async function submitBooking() {
 
   // Re-fetch to check conflicts
   await loadBookings();
+  if (isPastSlotForToday(selectedDate.date, selectedSlot.id)) {
+    setLoading(false);
+    toast('This time slot has already passed. Please choose a future slot.');
+    renderTimeGrid();
+    return;
+  }
   if (bookings.find(b => b.dayDate === selectedDate.date && b.slotId === selectedSlot.id)) {
     setLoading(false);
     toast('This slot was just booked by someone else!');
@@ -412,9 +430,55 @@ function toast(msg) {
   setTimeout(() => t.style.display = 'none', 3500);
 }
 
-const studentIdInput = document.getElementById('f-id');
-if (studentIdInput) {
-  studentIdInput.addEventListener('input', () => {
-    studentIdInput.value = studentIdInput.value.replace(/\D/g, '');
+function dateKeyLocal(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function isPastSlotForToday(dayDate, slotId) {
+  if (dayDate !== dateKeyLocal(new Date())) return false;
+  if (!/^\d{4}$/.test(slotId)) return false;
+
+  const hour = Number(slotId.slice(0, 2));
+  const minute = Number(slotId.slice(2, 4));
+  const slotStartMinutes = hour * 60 + minute;
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  return nowMinutes >= slotStartMinutes;
+}
+
+function enforceDigitOnlyInput(inputEl) {
+  if (!inputEl) return;
+
+  inputEl.addEventListener('keydown', (e) => {
+    const allowedKeys = [
+      'Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'
+    ];
+    const isShortcut = e.ctrlKey || e.metaKey;
+    if (allowedKeys.includes(e.key) || isShortcut) return;
+    if (!/^\d$/.test(e.key)) e.preventDefault();
+  });
+
+  inputEl.addEventListener('beforeinput', (e) => {
+    if (!e.data) return;
+    if (!/^\d+$/.test(e.data)) e.preventDefault();
+  });
+
+  inputEl.addEventListener('paste', (e) => {
+    const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    if (!/^\d+$/.test(pasted)) {
+      e.preventDefault();
+      inputEl.value = (inputEl.value + pasted).replace(/\D/g, '');
+    }
+  });
+
+  // Fallback sanitizer if browser allows non-digit input events.
+  inputEl.addEventListener('input', () => {
+    inputEl.value = inputEl.value.replace(/\D/g, '');
   });
 }
+
+enforceDigitOnlyInput(document.getElementById('f-id'));
