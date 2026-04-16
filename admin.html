@@ -91,7 +91,7 @@
       <h2>Add Booking</h2>
       <div class="field"><label>Name *</label><input type="text" id="create-name" placeholder="Full name" /></div>
       <div class="field"><label>Email *</label><input type="email" id="create-email" placeholder="@depaul.edu" /></div>
-      <div class="field"><label>Student ID *</label><input type="text" id="create-studentId" placeholder="Student ID" /></div>
+      <div class="field"><label>Student ID *</label><input type="text" id="create-studentId" inputmode="numeric" pattern="[0-9]*" placeholder="Student ID" /></div>
       <div class="field"><label>Course *</label><input type="text" id="create-course" placeholder="e.g. CSC 555 - Mining Big Data" /></div>
       <div class="field"><label>Reason</label><textarea id="create-reason" rows="2" placeholder="Brief reason for the appointment"></textarea></div>
       <div class="field">
@@ -120,7 +120,7 @@
       <input type="hidden" id="edit-id" />
       <div class="field"><label>Name</label><input type="text" id="edit-name" /></div>
       <div class="field"><label>Email</label><input type="email" id="edit-email" /></div>
-      <div class="field"><label>Student ID</label><input type="text" id="edit-studentId" /></div>
+      <div class="field"><label>Student ID</label><input type="text" id="edit-studentId" inputmode="numeric" pattern="[0-9]*" /></div>
       <div class="field"><label>Course</label><input type="text" id="edit-course" /></div>
       <div class="field"><label>Reason</label><textarea id="edit-reason" rows="3"></textarea></div>
       <div class="modal-btns">

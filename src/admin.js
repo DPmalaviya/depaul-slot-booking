@@ -107,6 +107,9 @@ async function saveCreate() {
   if (!name || !email || !studentId || !course || !dateVal || !slotVal) {
     toast('Please fill in all required fields.'); return;
   }
+  if (!/^\d+$/.test(studentId)) {
+    toast('Student ID must contain digits only'); return;
+  }
   if (!email.endsWith('@depaul.edu')) {
     toast('Email must be @depaul.edu'); return;
   }
@@ -240,6 +243,9 @@ async function saveEdit() {
 
   if (!name || !email || !studentId || !course) {
     toast('Please fill in all required fields.'); return;
+  }
+  if (!/^\d+$/.test(studentId)) {
+    toast('Student ID must contain digits only'); return;
   }
   if (!email.endsWith('@depaul.edu')) {
     toast('Email must be @depaul.edu'); return;
@@ -417,3 +423,11 @@ function toast(msg) {
   t.textContent = msg; t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3000);
 }
+
+['create-studentId', 'edit-studentId'].forEach((id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', () => {
+    el.value = el.value.replace(/\D/g, '');
+  });
+});

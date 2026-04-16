@@ -43,6 +43,9 @@ function goStep2() {
   if (!email.endsWith('@depaul.edu')) {
     document.getElementById('email-err').style.display = 'block'; return;
   }
+  if (!/^\d+$/.test(id)) {
+    toast('Student ID must contain digits only'); return;
+  }
   document.getElementById('email-err').style.display = 'none';
 
   student = { name, id, email, course, reason };
@@ -407,4 +410,11 @@ function toast(msg) {
   t.textContent = msg;
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3500);
+}
+
+const studentIdInput = document.getElementById('f-id');
+if (studentIdInput) {
+  studentIdInput.addEventListener('input', () => {
+    studentIdInput.value = studentIdInput.value.replace(/\D/g, '');
+  });
 }
